@@ -1,0 +1,251 @@
+Formatted and Documented Code.
+
+fixed hihat so the note saves.
+removed hi hat pad changing option which in turn changed the UI.
+the first page is transposing the pads and HIHat note.
+next page is thresholds/velocity.
+next page is calibration.
+final page is save/load.
+
+
+This is now Version1. It will be the base of all revisions until a 
+new version is deemed better. It compiles, runs, and functions very well.
+
+RAM is completely full.
+At this point the RAM on the board is full. 
+This means that no more features can be added without reducing
+the size of the overall project.
+This could be done by rewriting the LCD menu system within
+the main arduino class. This would remove the need of several
+pointers for each menu item, but is not exactly ideal from
+a readability point of view.
+
+
+
+*Option One Quit While I'm Ahead
+	The feature list is still impressive, responsive,
+the project is essentially complete. Any changes would be a cherry on top.
+
+*Option Two The Cherry on Top
+	Try to struggle with the memory and keep the current model
+for the user menu. This is probably bordering impossible.
+
+*Option Three
+	Try to rewrite the UserMenu completely in the UIScreen class.
+no inheritence, no multiple copies of array pointers floating around.
+The menu would be hard coded, and straightforward. this would free
+up a significant amount of RAM.
+*Option Four
+	Rewrite the Menu in the Arduino Class. this would
+be a nightmare, but also extremely efficient. Probably overkill
+both for squeezing memory and readability.
+
+Option 3 or option 2 sound the best. Option 1 is highly considered, and
+a Copy of the Project as is will be saved and backed up in case
+the other courses of action fail.
+
+
+The features lacking are few. 
+
+Hi Hat Pedal is functional.
+
+UI menu needs some more features
+
+TODO
+*rewrite array memory managment
+
+*Hi Hat Controller as well as menu page
+Starting this first. The array rewrite is super tedious.
+
+
+*Patch/Bank, Midi Options page, midi channel. this is cancelled
+
+
+11/29/2014
+thought I ran out of RAM but i think it was an issue with constructors.
+The Save and Load have been set and tested. They appear to work well.
+Midi Channel can be changed,
+although it has little effect. To truly take advantage
+the patch must be able to be edited. This cannot be done 
+easily with the current implementation, however...
+Adding a similar method function to input Printer could allow 
+a menu item to generate a midi message.
+
+OR a serial output line can be written directly in the menu item...
+i think.
+
+Stil to do:
+*fix memory structure as described earlier.
+*Review and Document Code.
+HiHat controller time permitting.
+
+
+11/28/2014 (2)
+Finished building the remaining pads. The last 3 built seem to be
+very well tuned. They were compressed using duct tape, this way
+there is less flex and rebound in the layers. They seem to be very
+well made. The first 3 are still pretty lousy.
+
+The drum machine accepts all 6 inputs. each pad can be individually
+programmed, or calibrated. The save/load of presets is yet to come.
+the default might be saved to ProgMEM. This has been ignored as of
+yet and may be irrelevant. The default isn't exactly
+all that great anyways, all lower thresholds to 100, uppers to 1020.
+
+But it will at least be a starting point for user customization.
+
+Todo List
+*Make change in previous log to the pointers of arrays.
+*Finish save/load
+*Add a numberElement for midiChannel.
+*review user menu and consider style changes
+*Review body of code and document/polish things
+
+*HitHat controller time permitting
+
+11/28/2014
+made the entire project work with6 triggers
+this is tedious and changing the number of triggers later would not be ideal
+
+An Idea to fix this...
+have the main arduino project which houses the triggers create
+the arrays of pointers needed by the user menu, then pass it along
+this way all the array pointers later in the project can be 
+arbitrarily sized since they actually dont contain data anyways,
+the UIScreen is the only one that suffers since it DOES need to store
+those arrays, if they are prepopulated it can use pointers
+like everyone else.
+(just send numtriggers and the arrays, it can copy element-wise into
+its local array pointers).
+
+seemingly finished the save preset option, cannot test until the load
+preset option is also complete.
+
+the User menu is now 5 menu items wide. It also must have
+every item occupied or else it will not operate properly.
+
+TODO:
+finish and test save/load
+build remaining pads.
+
+hiHat controller if time permits.
+
+
+11/25/2014 (2)
+Create the EEPROM Save and Load UI Elements
+	
+So far the SavePreset Element is coming along nicely. It has a nice state system similar to
+the Calibration page, but so far is incapable of actually saving any data.
+EEPROM should be easy, the only problem are a few pieces of data that exceed a single byte in size.
+The ints for Threshold Upper/Lower are the prime suspects. I could change the threshold variable to 
+round up or down to the nearest 5 in calibration, this would be acceptable to me, but I want to explore 
+saving 2 bytes instead. the only other problem is if the calibration makes it a not-divisible-by-5 
+number I may get out of bounds issues. 
+11/25/2014
+
+Finished the Calibration Menu
+its not that pretty, might tweak it in the future.
+but for now it is functional and pretty awesome.
+
+11/24/2014
+
+changed a line in UIScreen.cpp, at the end of the case it 
+looked like it was running execute twice. commented it out,
+and seems to work fine. 
+
+The next big step Is to implement the Calibration menu item.
+This is an extremely important phase. The new and (improved?) 
+triggering algorithm has been programmed and it is highly variable.
+The calibration menu should help ensure that the pads are triggering
+properly despite each of them giving varied readings.
+
+The calibration menu shares features of ArrayElement
+but has vastly different behaviour. The simplest course of action
+would be to make a new Element strictly for calibration.
+There will be very use-specific code anyway, so this is an
+important feature that cannot be slapped on to an already existing
+construct.
+
+A single element should do, it will be passed the array of trigger
+last read values, so it sees exactly what readings the pads make.
+
+The UI will need to look odd.
+Calibration
+Pad = #
+4 Steps. Hit OK
+Begin. < when unlocked
+
+when locked 
+1.Dont Tap	Gets noise
+2.Tap Soft	Gets low thresh
+3.Tap Hard	Gets upper thresh
+
+if low thresh > upper thresh, or other bad values,
+Error Try Again
+if it checks out.
+Pad Calibrated
+
+hitting ok from Pad calibrated or Try again will unlock the element
+so the user can try to calibrate something else.
+
+
+11/23/ 2014 (2)
+got the code for UIArrayElement to work on the NoteValue
+now adding arrays for thresholds and velocities will follow.
+
+user menu is nearing completion
+hysteresis of the pad input does not seem to help as much
+as desired with preventing false positives.
+
+todo:
+experiment with different methods of controlling input
+calibration?
+saving/loading presets
+hihat control
+
+
+
+11/23/2014
+found out some more syntactic issues with pointers
+*pointer points to the value held by the pointer
+pointer is the address
+pointer = &newVar sets the pointer to a new address
+
+11/21/2014
+realized a bug in logic. the UINumberElement does not dynamically update
+must find a way for it to intelligently access the proper number
+or pass it a new argument every update.
+
+perhaps have UIArrayNumbers which takes a [int1,int2] so on array and a 
+second argument to point to which one? this would work, would be a bit of a pain
+however. would have to be derived class of already derived class UINumberElement
+
+Better Solution: change UINumberElement to take an array of integers by default
+for single ints it will just be an array set to [int x] with an accessor 
+variable set to 0. WIN!
+
+as of this entry no real progress has been made since last update
+11/20/2014
+
+todo: attempt to relocate LCD object to main class, not UIScreen.
+LCD is now moved into the main.ino class. Has not been tested yet
+as the arduino is not with me. Compiles however, and logic seems sound.
+
+todo: attempt to add locking/unlocking of UINumberElement. Also how an element can be unlocked.
+UINumberElement -> added unlocking, and number manipulation functionality.
+UINumber Element may be complete?
+
+removed 'boolean selectable' and 'boolean isSelectable' from all derived classes as base class can handle it
+
+added some documentation
+
+11/19/2014
+
+Ensured that UIElement family of objects work
+UITextElement works as predicted.
+
+Added UINumberElement
+	This derived class is not yet complete.It still needs its
+	Execute function to override the base functionality.
+
+Made the Selector blink, this feature might be altered or removed
